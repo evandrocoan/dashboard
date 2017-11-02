@@ -3,6 +3,7 @@ import './styles.css';
 import ColorHash from 'color-hash';
 import debounce from 'lodash.debounce';
 import classnames from 'classnames';
+import mixpanel from 'mixpanel-browser';
 
 import { connect } from 'react-redux';
 
@@ -175,10 +176,26 @@ export class LinkDetail extends React.Component {
   render() {
     const link = this.props.initialLinkState;
 
+    process.env.REACT_APP_MIXPANEL_TOKEN && mixpanel.track('Rendered link detail page', {
+      props: this.props,
+      state: this.state,
+    });
+
     if (!link) {
-      return <div className="link-detail-empty">
-        No such link was found.
-      </div>;
+      process.env.REACT_APP_MIXPANEL_TOKEN && mixpanel.track('Rendered empty link detail page', {
+        props: this.props,
+        state: this.state,
+      });
+
+      if (this.props.loading) {
+        return <div className="link-detail-empty">
+          Loading link...
+        </div>;
+      } else {
+        return <div className="link-detail-empty">
+          No such link was found.
+        </div>;
+      }
     }
 
     return <div>
